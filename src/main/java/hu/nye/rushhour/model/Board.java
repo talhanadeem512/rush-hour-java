@@ -47,7 +47,7 @@ public class Board {
             throw new IllegalArgumentException("Vehicle overlaps with another vehicle.");
         }
 
-        if(containsVehicle(vehicle.getId())) {
+        if(containsVehicleId(vehicle.getId())) {
             throw new IllegalArgumentException("Vehicle already exists.");
         }
 
@@ -109,7 +109,7 @@ public class Board {
      *
      * @return true if the ID already exists
      */
-    public boolean containsVehicle(String id) {
+    public boolean containsVehicleId(String id) {
         for(Vehicle vehicle : vehicles) {
             if(vehicle.getId().equals(id)) {
                 return true;
