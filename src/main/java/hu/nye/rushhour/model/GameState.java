@@ -6,7 +6,7 @@ package hu.nye.rushhour.model;
 public class GameState {
 
     private final Board board;
-    private final String humanHeroID;
+    public final String humanHeroID;
     public final String machineHeroID;
 
     /**
@@ -24,9 +24,22 @@ public class GameState {
             throw new IllegalArgumentException("Both hero vehicles must exist on the board.");
         }
 
+        if(humanHeroID.equals(machineHeroID)) {
+            throw new IllegalArgumentException("Players must have different hero vehicles.");
+        }
+
         this.board = board;
         this.humanHeroID = humanHeroID;
         this.machineHeroID = machineHeroID;
+    }
+
+    /**
+     * Returns the game board.
+     *
+     * @return the current game board.
+     */
+    public Board getBoard() {
+        return board;
     }
 
     /**

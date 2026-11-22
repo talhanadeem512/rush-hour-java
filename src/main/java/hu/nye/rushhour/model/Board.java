@@ -30,7 +30,7 @@ public class Board {
      * @param vehicle the vehicle to add
      *
      */
-    public void addvehicle(Vehicle vehicle) {
+    public void addVehicle(Vehicle vehicle) {
         if ( vehicle == null ) {
             throw new IllegalArgumentException(
                     "Vehicle cannot be null."
