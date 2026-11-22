@@ -118,6 +118,16 @@ public class Board {
 
         return false;
     }
+
+    /**
+     * Returns an unmodified view of vehicles on the board.
+     *
+     * @return vehicles currently on the board.
+     */
+    public List<Vehicle> getVehicles() {
+        return java.util.Collections.unmodifiableList(vehicles);
+    }
+
     public int getRows() {
         return rows;
     }
