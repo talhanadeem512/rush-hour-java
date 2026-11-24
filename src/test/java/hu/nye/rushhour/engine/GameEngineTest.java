@@ -78,4 +78,136 @@ public class GameEngineTest {
 
         assertThrows(IllegalArgumentException.class, () -> gameEngine.findVehicleById("X"));
     }
+
+    @Test
+    void shouldAllowValidHorizontalMovement() {
+        Board board = new Board(6, 12);
+
+        board.addVehicle(new Vehicle("H", 2, Orientation.HORIZONTAL, new Position(2, 1)));
+
+        board.addVehicle(new Vehicle("M", 2, Orientation.VERTICAL, new Position(0, 10)));
+
+        GameState gameState = new GameState(board, "H", "M");
+        GameEngine gameEngine = new GameEngine(gameState);
+
+        assertTrue(gameEngine.isMoveValid(new Move("H", 2)));
+    }
+
+    @Test
+    void shouldAllowValidVerticalMovement() {
+        Board board = new Board(6, 12);
+
+        board.addVehicle(new Vehicle("H", 2, Orientation.VERTICAL, new Position(0, 2)));
+
+        board.addVehicle(new Vehicle("M", 2, Orientation.HORIZONTAL, new Position(4, 8)));
+
+        GameState gameState = new GameState(board, "H", "M");
+        GameEngine gameEngine = new GameEngine(gameState);
+
+        assertTrue(gameEngine.isMoveValid(new Move("H", 2)));
+    }
+
+    @Test
+    void shouldAllowValidBackwardsMovement() {
+        Board board = new Board(6, 12);
+
+        board.addVehicle(new Vehicle("H", 2, Orientation.HORIZONTAL, new Position(2, 4)));
+
+        board.addVehicle(new Vehicle("M", 2, Orientation.VERTICAL, new Position(0, 10)));
+
+        GameState gameState = new GameState(board, "H", "M");
+        GameEngine gameEngine = new GameEngine(gameState);
+
+        assertTrue(gameEngine.isMoveValid(new Move("H", -2)));
+    }
+
+    @Test
+    void shouldRejectMovementOutsideBoard() {
+        Board board = new Board(6, 12);
+
+        board.addVehicle(new Vehicle(
+                "A", 2, Orientation.HORIZONTAL, new Position(2, 9)
+        ));
+
+        board.addVehicle(new Vehicle(
+                "B", 2, Orientation.VERTICAL, new Position(0, 0)
+        ));
+
+        GameState state = new GameState(board, "A", "B");
+        GameEngine engine = new GameEngine(state);
+
+        assertFalse(engine.isMoveValid(new Move("A", 2)));
+    }
+
+    @Test
+    void shouldRejectMovementIntoAnotherVehicle() {
+        Board board = new Board(6, 12);
+
+        board.addVehicle(new Vehicle(
+                "A", 2, Orientation.HORIZONTAL, new Position(2, 1)
+        ));
+
+        board.addVehicle(new Vehicle(
+                "B", 2, Orientation.HORIZONTAL, new Position(2, 4)
+        ));
+
+        GameState state = new GameState(board, "A", "B");
+        GameEngine engine = new GameEngine(state);
+
+        assertFalse(engine.isMoveValid(new Move("A", 2)));
+    }
+
+    @Test
+    void shouldRejectMovementThroughAnotherVehicle() {
+        Board board = new Board(6, 12);
+
+        board.addVehicle(new Vehicle(
+                "A", 2, Orientation.HORIZONTAL, new Position(2, 1)
+        ));
+
+        board.addVehicle(new Vehicle(
+                "B", 2, Orientation.VERTICAL, new Position(1, 4)
+        ));
+
+        GameState state = new GameState(board, "A", "B");
+        GameEngine engine = new GameEngine(state);
+
+        assertFalse(engine.isMoveValid(new Move("A", 4)));
+    }
+
+    @Test
+    void shouldRejectNullMove() {
+        Board board = new Board(6, 12);
+
+        board.addVehicle(new Vehicle(
+                "A", 2, Orientation.HORIZONTAL, new Position(2, 1)
+        ));
+
+        board.addVehicle(new Vehicle(
+                "B", 2, Orientation.VERTICAL, new Position(0, 10)
+        ));
+
+        GameState state = new GameState(board, "A", "B");
+        GameEngine engine = new GameEngine(state);
+
+        assertFalse(engine.isMoveValid(null));
+    }
+
+    @Test
+    void shouldRejectMoveForNonExistingVehicle() {
+        Board board = new Board(6, 12);
+
+        board.addVehicle(new Vehicle(
+                "A", 2, Orientation.HORIZONTAL, new Position(2, 1)
+        ));
+
+        board.addVehicle(new Vehicle(
+                "B", 2, Orientation.VERTICAL, new Position(0, 10)
+        ));
+
+        GameState state = new GameState(board, "A", "B");
+        GameEngine engine = new GameEngine(state);
+
+        assertFalse(engine.isMoveValid(new Move("C", 2)));
+    }
 }

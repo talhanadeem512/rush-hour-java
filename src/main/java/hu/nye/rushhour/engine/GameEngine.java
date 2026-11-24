@@ -64,7 +64,13 @@ public class GameEngine {
             return false;
         }
 
-        Vehicle vehicle = findVehicleById(move.getVehicleId());
+        Vehicle vehicle;
+
+        try{
+            vehicle = findVehicleById(move.getVehicleId());
+        }catch(IllegalArgumentException e){
+            return false;
+        }
 
         Position newPosition = calculateNewPosition(vehicle, move);
 
