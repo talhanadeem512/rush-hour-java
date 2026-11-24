@@ -210,4 +210,65 @@ public class GameEngineTest {
 
         assertFalse(engine.isMoveValid(new Move("C", 2)));
     }
+
+    @Test
+    void shouldExecuteValidHorizontalMove(){
+        Board board = new Board(6, 12);
+
+        Vehicle vehicle = new Vehicle("H", 2, Orientation.HORIZONTAL, new Position(2, 1));
+
+        Vehicle vehicle2 = new Vehicle("M", 2, Orientation.VERTICAL, new Position(4, 8));
+
+        board.addVehicle(vehicle);
+        board.addVehicle(vehicle2);
+
+        GameState state = new GameState(board, "H", "M");
+        GameEngine engine = new GameEngine(state);
+
+        Move move = new Move("H", 2);
+
+        engine.executeMove(move);
+
+        assertEquals(3, board.getVehicles().get(0).getPosition().getColumn());
+    }
+
+    @Test
+    void shouldExecuteValidVerticalMove(){
+        Board board = new Board(6, 12);
+
+        Vehicle vehicle = new Vehicle("H", 2, Orientation.VERTICAL, new Position(2, 1));
+
+        Vehicle vehicle2 = new Vehicle("M", 2, Orientation.HORIZONTAL, new Position(4, 8));
+
+        board.addVehicle(vehicle);
+        board.addVehicle(vehicle2);
+
+        GameState state = new GameState(board, "H", "M");
+        GameEngine engine = new GameEngine(state);
+
+        Move move = new Move("H", 2);
+
+        engine.executeMove(move);
+
+        assertEquals(4, board.getVehicles().get(0).getPosition().getRow());
+    }
+
+    @Test
+    void shouldRejectInvalidMove(){
+        Board board = new Board(6, 12);
+
+        Vehicle vehicle = new Vehicle("H", 2, Orientation.HORIZONTAL, new Position(2, 9));
+        Vehicle vehicle2 = new Vehicle("M", 2, Orientation.VERTICAL, new Position(4, 8));
+
+        board.addVehicle(vehicle);
+        board.addVehicle(vehicle2);
+
+        GameState state = new GameState(board, "H", "M");
+        GameEngine engine = new GameEngine(state);
+
+        Move move = new Move("H", 2);
+
+        assertThrows(IllegalArgumentException.class, () -> engine.executeMove(move));
+        assertEquals(9, board.getVehicles().get(0).getPosition().getColumn());
+    }
 }
