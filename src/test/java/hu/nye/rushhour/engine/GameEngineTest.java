@@ -26,7 +26,7 @@ public class GameEngineTest {
 
     @Test
     public void shouldRejectNullGameState() {
-        assertThrows(NullPointerException.class, () -> new GameEngine(null));
+        assertThrows(IllegalArgumentException.class, () -> new GameEngine(null));
     }
 
     @Test
