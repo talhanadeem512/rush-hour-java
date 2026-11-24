@@ -135,33 +135,40 @@ public class Board {
      * @return
      */
     public void updateVehicle(Vehicle updatedVehicle) {
-        if(updatedVehicle == null) {
+        if (updatedVehicle == null) {
             throw new IllegalArgumentException("Vehicle cannot be null.");
         }
 
         int vehicleIndex = -1;
-        for(int i = 0; i < vehicles.size(); i++) {
-            if(vehicles.get(i).getId().equals(updatedVehicle.getId())) {
+        for (int i = 0; i < vehicles.size(); i++) {
+            if (vehicles.get(i).getId().equals(updatedVehicle.getId())) {
                 vehicleIndex = i;
                 break;
             }
         }
 
-        if(vehicleIndex == -1) {
+        if (vehicleIndex == -1) {
             throw new IllegalArgumentException("Vehicle does not exist.");
         }
 
         Vehicle originalVehicle = vehicles.remove(vehicleIndex);
-        try{
-            if(!isWithinBounds(updatedVehicle)) {
-                throw new IllegalArgumentException("Vehicle is outside the Board.");
+
+        try {
+            if (!isWithinBounds(updatedVehicle)) {
+                throw new IllegalArgumentException("Vehicle is outside the board.");
             }
-            if(overlapsWithExistingVehicle(updatedVehicle)) {
-                throw new IllegalArgumentException("Vehicle overlaps with another vehicle.");
-            };
-        }catch(IllegalArgumentException e){
+
+            if (overlapsWithExistingVehicle(updatedVehicle)) {
+                throw new IllegalArgumentException(
+                        "Vehicle overlaps with another vehicle."
+                );
+            }
+
+            vehicles.add(vehicleIndex, updatedVehicle);
+
+        } catch (IllegalArgumentException exception) {
             vehicles.add(vehicleIndex, originalVehicle);
-            throw e;
+            throw exception;
         }
     }
 
