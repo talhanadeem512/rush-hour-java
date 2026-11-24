@@ -17,7 +17,7 @@ public class GameEngineTest {
         board.addVehicle(humanHero);
         board.addVehicle(machineHero);
 
-        GameState gameState = new GameState(board, "H", "M");
+        GameState gameState = new GameState(board, "H", "M", 2, 3, ExitSide.RIGHT, ExitSide.RIGHT);
 
         GameEngine gameEngine = new GameEngine(gameState);
 
@@ -39,7 +39,7 @@ public class GameEngineTest {
 
         board.addVehicle(humanHero);
         board.addVehicle(machineHero);
-        GameState gameState = new GameState(board, "H", "M");
+        GameState gameState = new GameState(board, "H", "M", 2, 3, ExitSide.RIGHT, ExitSide.RIGHT);
         GameEngine gameEngine = new GameEngine(gameState);
 
         Vehicle result = gameEngine.findVehicleById("H");
@@ -55,7 +55,7 @@ public class GameEngineTest {
 
         board.addVehicle(humanHero);
         board.addVehicle(machineHero);
-        GameState gameState = new GameState(board, "H", "M");
+        GameState gameState = new GameState(board, "H", "M", 2, 3, ExitSide.RIGHT, ExitSide.RIGHT);
         GameEngine gameEngine = new GameEngine(gameState);
 
         assertThrows(IllegalArgumentException.class, () -> gameEngine.findVehicleById(""));
@@ -73,7 +73,7 @@ public class GameEngineTest {
 
         board.addVehicle(humanHero);
         board.addVehicle(machineHero);
-        GameState gameState = new GameState(board, "H", "M");
+        GameState gameState = new GameState(board, "H", "M", 2, 3, ExitSide.RIGHT, ExitSide.RIGHT);
         GameEngine gameEngine = new GameEngine(gameState);
 
         assertThrows(IllegalArgumentException.class, () -> gameEngine.findVehicleById("X"));
@@ -87,7 +87,7 @@ public class GameEngineTest {
 
         board.addVehicle(new Vehicle("M", 2, Orientation.VERTICAL, new Position(0, 10)));
 
-        GameState gameState = new GameState(board, "H", "M");
+        GameState gameState = new GameState(board, "H", "M", 2, 10, ExitSide.RIGHT, ExitSide.BOTTOM);
         GameEngine gameEngine = new GameEngine(gameState);
 
         assertTrue(gameEngine.isMoveValid(new Move("H", 2)));
@@ -101,11 +101,12 @@ public class GameEngineTest {
 
         board.addVehicle(new Vehicle("M", 2, Orientation.HORIZONTAL, new Position(4, 8)));
 
-        GameState gameState = new GameState(board, "H", "M");
+        GameState gameState = new GameState(board, "H", "M", 2, 4, ExitSide.BOTTOM, ExitSide.RIGHT);
         GameEngine gameEngine = new GameEngine(gameState);
 
         assertTrue(gameEngine.isMoveValid(new Move("H", 2)));
     }
+
 
     @Test
     void shouldAllowValidBackwardsMovement() {
@@ -115,7 +116,7 @@ public class GameEngineTest {
 
         board.addVehicle(new Vehicle("M", 2, Orientation.VERTICAL, new Position(0, 10)));
 
-        GameState gameState = new GameState(board, "H", "M");
+        GameState gameState = new GameState(board, "H", "M", 2, 10, ExitSide.RIGHT, ExitSide.BOTTOM);
         GameEngine gameEngine = new GameEngine(gameState);
 
         assertTrue(gameEngine.isMoveValid(new Move("H", -2)));
@@ -133,7 +134,7 @@ public class GameEngineTest {
                 "B", 2, Orientation.VERTICAL, new Position(0, 0)
         ));
 
-        GameState state = new GameState(board, "A", "B");
+        GameState state = new GameState(board, "A", "B", 2, 0, ExitSide.RIGHT, ExitSide.BOTTOM);
         GameEngine engine = new GameEngine(state);
 
         assertFalse(engine.isMoveValid(new Move("A", 2)));
@@ -151,7 +152,7 @@ public class GameEngineTest {
                 "B", 2, Orientation.HORIZONTAL, new Position(2, 4)
         ));
 
-        GameState state = new GameState(board, "A", "B");
+        GameState state = new GameState(board, "A", "B", 2, 2, ExitSide.RIGHT, ExitSide.LEFT);
         GameEngine engine = new GameEngine(state);
 
         assertFalse(engine.isMoveValid(new Move("A", 2)));
@@ -169,7 +170,7 @@ public class GameEngineTest {
                 "B", 2, Orientation.VERTICAL, new Position(1, 4)
         ));
 
-        GameState state = new GameState(board, "A", "B");
+        GameState state = new GameState(board, "A", "B", 2, 4, ExitSide.RIGHT, ExitSide.BOTTOM);
         GameEngine engine = new GameEngine(state);
 
         assertFalse(engine.isMoveValid(new Move("A", 4)));
@@ -187,7 +188,7 @@ public class GameEngineTest {
                 "B", 2, Orientation.VERTICAL, new Position(0, 10)
         ));
 
-        GameState state = new GameState(board, "A", "B");
+        GameState state = new GameState(board, "A", "B", 2, 10, ExitSide.RIGHT, ExitSide.BOTTOM);
         GameEngine engine = new GameEngine(state);
 
         assertFalse(engine.isMoveValid(null));
@@ -205,7 +206,7 @@ public class GameEngineTest {
                 "B", 2, Orientation.VERTICAL, new Position(0, 10)
         ));
 
-        GameState state = new GameState(board, "A", "B");
+        GameState state = new GameState(board, "A", "B", 2, 10, ExitSide.RIGHT, ExitSide.BOTTOM);
         GameEngine engine = new GameEngine(state);
 
         assertFalse(engine.isMoveValid(new Move("C", 2)));
@@ -222,7 +223,7 @@ public class GameEngineTest {
         board.addVehicle(vehicle);
         board.addVehicle(vehicle2);
 
-        GameState state = new GameState(board, "H", "M");
+        GameState state = new GameState(board, "H", "M", 2, 8, ExitSide.RIGHT, ExitSide.BOTTOM);
         GameEngine engine = new GameEngine(state);
 
         Move move = new Move("H", 2);
@@ -243,7 +244,7 @@ public class GameEngineTest {
         board.addVehicle(vehicle);
         board.addVehicle(vehicle2);
 
-        GameState state = new GameState(board, "H", "M");
+        GameState state = new GameState(board, "H", "M", 1, 4, ExitSide.BOTTOM, ExitSide.RIGHT);
         GameEngine engine = new GameEngine(state);
 
         Move move = new Move("H", 2);
@@ -263,7 +264,7 @@ public class GameEngineTest {
         board.addVehicle(vehicle);
         board.addVehicle(vehicle2);
 
-        GameState state = new GameState(board, "H", "M");
+        GameState state = new GameState(board, "H", "M", 2, 8, ExitSide.RIGHT, ExitSide.BOTTOM);
         GameEngine engine = new GameEngine(state);
 
         Move move = new Move("H", 2);
@@ -283,7 +284,7 @@ public class GameEngineTest {
         board.addVehicle(humanVehicle);
         board.addVehicle(machineVehicle);
 
-        GameState state = new GameState(board, "H", "M");
+        GameState state = new GameState(board, "H", "M", 2, 8, ExitSide.RIGHT, ExitSide.BOTTOM);
         GameEngine engine = new GameEngine(state);
 
         engine.executeTurnMove(Player.HUMAN, new Move("H", 2));
@@ -299,7 +300,7 @@ public class GameEngineTest {
         board.addVehicle(new Vehicle("H", 2, Orientation.HORIZONTAL, new Position(2, 1)));
         board.addVehicle(new Vehicle("M", 2, Orientation.VERTICAL, new Position(4, 8)));
 
-        GameState state = new GameState(board, "H", "M");
+        GameState state = new GameState(board, "H", "M", 2, 8, ExitSide.RIGHT, ExitSide.BOTTOM);
         GameEngine engine = new GameEngine(state);
 
         assertThrows(IllegalArgumentException.class, () -> engine.executeTurnMove(Player.MACHINE, new Move("M", 1)));
@@ -312,7 +313,7 @@ public class GameEngineTest {
         board.addVehicle(new Vehicle("H", 2, Orientation.HORIZONTAL, new Position(2, 1)));
         board.addVehicle(new Vehicle("M", 2, Orientation.VERTICAL, new Position(4, 8)));
 
-        GameState state = new GameState(board, "H", "M");
+        GameState state = new GameState(board, "H", "M", 2, 8, ExitSide.RIGHT, ExitSide.BOTTOM);
         GameEngine engine = new GameEngine(state);
 
         assertThrows(IllegalArgumentException.class, () -> engine.executeTurnMove(Player.HUMAN, new Move("H", 10)));
