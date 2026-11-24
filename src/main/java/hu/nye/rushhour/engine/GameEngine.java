@@ -5,6 +5,7 @@ import hu.nye.rushhour.model.*;
 public class GameEngine {
 
     private final GameState gameState;
+    private final TurnManager turnManager;
 
     /**
      * Create a game engine for the given game state.
@@ -16,6 +17,7 @@ public class GameEngine {
         }
 
         this.gameState = gameState;
+        this.turnManager = new TurnManager();
     }
 
     /**
@@ -192,4 +194,25 @@ public class GameEngine {
 
         gameState.getBoard().updateVehicle(updatedvehicle);
     }
+
+    /**
+     * Executes a move on behalf of the current player.
+     *
+     * @throws IllegalArgumentException if the player is null or it is not their turn
+     * @throws IllegalArgumentException if the move is invalid
+     */
+    public void executeTurnMove(Player player, Move move) {
+        if(player == null || player != turnManager.getCurrentPlayer()) {
+            throw new IllegalArgumentException("It is not this player's turn.");
+        }
+
+        executeMove(move);
+
+        turnManager.switchTurn();
+    }
+
+    public Player getCurrentPlayer() {
+        return turnManager.getCurrentPlayer();
+    }
+
 }
