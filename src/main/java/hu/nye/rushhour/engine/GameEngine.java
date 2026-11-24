@@ -173,4 +173,23 @@ public class GameEngine {
 
         return true;
     }
+
+    /**
+     * Executes a valid move nad updates the board.
+     *
+     * @throws IllegalArgumentException if the move is invalid.
+     */
+    public void executeMove(Move move) {
+        if (!isMoveValid(move)) {
+            throw new IllegalArgumentException("Invalid move.");
+        }
+
+        Vehicle vehicle = findVehicleById(move.getVehicleId());
+
+        Position newPosition = calculateNewPosition(vehicle, move);
+
+        Vehicle updatedvehicle = new Vehicle(vehicle.getId(), vehicle.getLength(), vehicle.getOrientation(), newPosition);
+
+        gameState.getBoard().updateVehicle(updatedvehicle);
+    }
 }
