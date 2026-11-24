@@ -271,4 +271,54 @@ public class GameEngineTest {
         assertThrows(IllegalArgumentException.class, () -> engine.executeMove(move));
         assertEquals(9, board.getVehicles().get(0).getPosition().getColumn());
     }
+
+    @Test
+    void shouldAllowHUmanToMoveFirst(){
+        Board board = new Board(6, 12);
+
+        Vehicle humanVehicle = new Vehicle("H", 2, Orientation.HORIZONTAL, new Position(2, 1));
+
+        Vehicle machineVehicle = new Vehicle("M", 2, Orientation.VERTICAL, new Position(4, 8));
+
+        board.addVehicle(humanVehicle);
+        board.addVehicle(machineVehicle);
+
+        GameState state = new GameState(board, "H", "M");
+        GameEngine engine = new GameEngine(state);
+
+        engine.executeTurnMove(Player.HUMAN, new Move("H", 2));
+
+        assertEquals(Player.MACHINE, engine.getCurrentPlayer());
+        assertEquals(3, board.getVehicles().get(0).getPosition().getColumn());
+    }
+
+    @Test
+    void shouldRejectMachineMoveOnHumanTurn(){
+        Board board = new Board(6, 12);
+
+        board.addVehicle(new Vehicle("H", 2, Orientation.HORIZONTAL, new Position(2, 1)));
+        board.addVehicle(new Vehicle("M", 2, Orientation.VERTICAL, new Position(4, 8)));
+
+        GameState state = new GameState(board, "H", "M");
+        GameEngine engine = new GameEngine(state);
+
+        assertThrows(IllegalArgumentException.class, () -> engine.executeTurnMove(Player.MACHINE, new Move("M", 1)));
+        assertEquals(Player.HUMAN, engine.getCurrentPlayer());
+    }
+
+    @Test
+    void shouldNotSwitchTurnAfterInvalidMove(){
+        Board board = new Board(6, 12);
+        board.addVehicle(new Vehicle("H", 2, Orientation.HORIZONTAL, new Position(2, 1)));
+        board.addVehicle(new Vehicle("M", 2, Orientation.VERTICAL, new Position(4, 8)));
+
+        GameState state = new GameState(board, "H", "M");
+        GameEngine engine = new GameEngine(state);
+
+        assertThrows(IllegalArgumentException.class, () -> engine.executeTurnMove(Player.HUMAN, new Move("H", 10)));
+        assertEquals(Player.HUMAN, engine.getCurrentPlayer());
+        assertEquals(1, board.getVehicles().get(0).getPosition().getColumn());
+    }
+
+
 }
