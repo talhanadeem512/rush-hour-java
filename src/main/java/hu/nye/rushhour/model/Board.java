@@ -172,6 +172,26 @@ public class Board {
         }
     }
 
+    /**
+     * Removes a vehicle from the board using its ID.
+     *
+     * @throws IllegalArgumentException if the ID is invalid or the vehicle does not exist.
+     */
+    public void removeVehicleById(String vehicleId){
+        if(vehicleId == null || vehicleId.isBlank()){
+            throw new IllegalArgumentException("Vehicle Id cannot be empty.");
+        }
+
+        for(int i = 0; i < vehicles.size(); i++) {
+            if(vehicles.get(i).getId().equals(vehicleId)) {
+                vehicles.remove(i);
+                return;
+            }
+        }
+
+        throw new IllegalArgumentException("Vehicle does not exist.");
+    }
+
     public int getRows() {
         return rows;
     }

@@ -111,4 +111,30 @@ public class BoardTest {
         assertEquals(1,  board.getVehicles().get(0).getPosition().getColumn());
         assertEquals(4,  board.getVehicles().get(1).getPosition().getColumn());
     }
+
+    @Test
+    public void shouldRemoveExistingVehicle() {
+        Board board = new Board(6, 12);
+        Vehicle vehicle = new Vehicle(
+                "A", 2, Orientation.HORIZONTAL, new Position(0, 0)
+        );
+        board.addVehicle(vehicle);
+
+        board.removeVehicleById("A");
+
+        assertEquals(0, board.getVehicleCount());
+        assertFalse(board.containsVehicleId("A"));
+    }
+
+    @Test
+    public void shouldRejectNullVehicleWhenRemoving(){
+        Board board = new Board(6, 12);
+        assertThrows(IllegalArgumentException.class, () -> board.removeVehicleById(null));
+    }
+
+    @Test
+    public void shouldRejectNonExistingVehicleIdWhenRemoving(){
+        Board board = new Board(6, 12);
+        assertThrows(IllegalArgumentException.class, () -> board.removeVehicleById("H"));
+    }
 }
