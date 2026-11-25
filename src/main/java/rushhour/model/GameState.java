@@ -1,7 +1,8 @@
-package hu.nye.rushhour.model;
+package rushhour.model;
 
 /**
- * Represents the current state of a Rush Hour game.
+ * Represents the current state of a Rush Hour game, including its board,
+ * players' hero vehicles, exit locations, and exit statuses.
  */
 public class GameState {
 
@@ -16,21 +17,38 @@ public class GameState {
     private final ExitSide machineExitSide;
 
     /**
-     * Creates a game state.
+     * Creates a game state with the specified board, hero vehicles, and exits.
+     *
+     * @param board the game board
+     * @param humanHeroID the ID of the human player's hero vehicle
+     * @param machineHeroID the ID of the machine player's hero vehicle
+     * @param humanExitCoordinate the coordinate of the human player's exit
+     * @param machineExitCoordinate the coordinate of the machine player's exit
+     * @param humanExitSide the side of the board containing the human player's exit
+     * @param machineExitSide the side of the board containing the machine player's exit
+     * @throws IllegalArgumentException if the board is null, hero IDs are invalid
+     *                                  or identical, hero vehicles do not exist,
+     *                                  exit coordinates are negative, exit sides
+     *                                  are null, or an exit is incompatible with
+     *                                  its hero vehicle
      */
-    public GameState(Board board, String humanHeroID, String machineHeroID,  int humanExitCoordinate, int machineExitCoordinate,  ExitSide humanExitSide, ExitSide machineExitSide) {
-        if(board == null) {
+    public GameState(Board board, String humanHeroID, String machineHeroID,
+                     int humanExitCoordinate, int machineExitCoordinate,
+                     ExitSide humanExitSide, ExitSide machineExitSide) {
+        if (board == null) {
             throw new IllegalArgumentException("Board cannot be null.");
         }
-        if(humanHeroID == null || humanHeroID.isBlank() || machineHeroID == null || machineHeroID.isBlank()) {
+        if (humanHeroID == null || humanHeroID.isBlank()
+                || machineHeroID == null || machineHeroID.isBlank()) {
             throw new IllegalArgumentException("Hero IDs cannot be null.");
         }
 
-        if(!board.containsVehicleId(humanHeroID) || !board.containsVehicleId(machineHeroID)) {
+        if (!board.containsVehicleId(humanHeroID)
+                || !board.containsVehicleId(machineHeroID)) {
             throw new IllegalArgumentException("Both hero vehicles must exist on the board.");
         }
 
-        if(humanHeroID.equals(machineHeroID)) {
+        if (humanHeroID.equals(machineHeroID)) {
             throw new IllegalArgumentException("Players must have different hero vehicles.");
         }
 
@@ -38,7 +56,7 @@ public class GameState {
             throw new IllegalArgumentException("Exit coordinates cannot be negative.");
         }
 
-        if(humanExitSide == null || machineExitSide == null){
+        if (humanExitSide == null || machineExitSide == null) {
             throw new IllegalArgumentException("Exit sides cannot be null.");
         }
 
@@ -70,9 +88,14 @@ public class GameState {
     }
 
     /**
-     * Checks whether an exit side matches the vehicle orientation.
+     * Checks whether the specified exit side is compatible with the hero
+     * vehicle's orientation.
      *
-     * @return true if exit side matches the vehicle orientation.
+     * @param board the game board containing the hero vehicle
+     * @param heroID the ID of the hero vehicle
+     * @param exitSide the assigned exit side
+     * @return {@code true} if the exit side matches the vehicle's orientation;
+     *         {@code false} otherwise
      */
     private boolean isExitCompatible(Board board, String heroID, ExitSide exitSide) {
         for (Vehicle vehicle : board.getVehicles()) {
@@ -89,9 +112,14 @@ public class GameState {
     }
 
     /**
-     * Checks whether the assigned exit coordinate aligns with the hero vehicle.
+     * Checks whether the specified exit coordinate aligns with the hero
+     * vehicle's row or column.
      *
-     * @return true if the exit coordinate aligns with the hero
+     * @param board the game board containing the hero vehicle
+     * @param heroID the ID of the hero vehicle
+     * @param exitCoordinate the coordinate assigned to the exit
+     * @return {@code true} if the exit coordinate aligns with the hero vehicle
+     *         and is within the board dimensions; {@code false} otherwise
      */
     private boolean isExitCoordinateValid(Board board, String heroID, int exitCoordinate) {
         for (Vehicle vehicle : board.getVehicles()) {
@@ -112,16 +140,16 @@ public class GameState {
     /**
      * Returns the game board.
      *
-     * @return the current game board.
+     * @return the current game board
      */
     public Board getBoard() {
         return board;
     }
 
     /**
-     * Return the human player's hero vehicle ID.
+     * Returns the human player's hero vehicle ID.
      *
-     * @return human hero vehicle ID
+     * @return the human hero vehicle ID
      */
     public String getHumanHeroID() {
         return humanHeroID;
@@ -130,7 +158,7 @@ public class GameState {
     /**
      * Returns the machine player's hero vehicle ID.
      *
-     *@return machine hero vehicle ID
+     * @return the machine hero vehicle ID
      */
     public String getMachineHeroID() {
         return machineHeroID;
@@ -145,65 +173,64 @@ public class GameState {
         return humanExitCoordinate;
     }
 
-    public int getMachineExitCoordinate() {
-        return machineExitCoordinate;
-    }
-
     /**
      * Returns the machine player's exit coordinate.
      *
      * @return the machine exit coordinate
      */
+    public int getMachineExitCoordinate() {
+        return machineExitCoordinate;
+    }
 
     /**
-     * Checks whether the human hero has exited the board.
+     * Checks whether the human player's hero vehicle has exited the board.
      *
-     * @return true if the human hero has exited
+     * @return {@code true} if the human hero has exited; {@code false} otherwise
      */
     public boolean hasHumanHeroExited() {
         return humanHeroExited;
     }
 
     /**
-     * Checks whether the machine hero has exited the board.
+     * Checks whether the machine player's hero vehicle has exited the board.
      *
-     * @return true if the machine hero has exited
+     * @return {@code true} if the machine hero has exited; {@code false} otherwise
      */
     public boolean hasMachineHeroExited() {
         return machineHeroExited;
     }
 
     /**
-     * Updates the human hero's exit status.
+     * Updates the exit status of the human player's hero vehicle.
      *
-     * @param exited whether the human hero has exited
+     * @param exited {@code true} if the human hero has exited; {@code false} otherwise
      */
     public void setHumanHeroExited(boolean exited) {
         this.humanHeroExited = exited;
     }
 
     /**
-     * Updates the machine hero's exit status.
+     * Updates the exit status of the machine player's hero vehicle.
      *
-     * @param exited whether the machine hero has exited
+     * @param exited {@code true} if the machine hero has exited; {@code false} otherwise
      */
     public void setMachineHeroExited(boolean exited) {
         this.machineHeroExited = exited;
     }
 
     /**
-     * Returns the human player's exit side.
+     * Returns the side of the board containing the human player's exit.
      *
-     * @return the human exit side
+     * @return the human player's exit side
      */
     public ExitSide getHumanExitSide() {
         return humanExitSide;
     }
 
     /**
-     * Returns the machine player's exit side.
+     * Returns the side of the board containing the machine player's exit.
      *
-     * @return the machine exit side
+     * @return the machine player's exit side
      */
     public ExitSide getMachineExitSide() {
         return machineExitSide;

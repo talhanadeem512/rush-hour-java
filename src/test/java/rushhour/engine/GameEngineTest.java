@@ -1,7 +1,10 @@
-package hu.nye.rushhour.engine;
+package rushhour.engine;
 
-import hu.nye.rushhour.model.*;
 import org.junit.jupiter.api.Test;
+import rushhour.engine.GameEngine;
+import rushhour.engine.Player;
+import rushhour.model.*;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class GameEngineTest {

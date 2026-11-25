@@ -1,4 +1,4 @@
-package hu.nye.rushhour.model;
+package rushhour.model;
 
 /**
  * Defines the possible orientation of vehicle.

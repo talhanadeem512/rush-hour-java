@@ -1,13 +1,15 @@
-package hu.nye.rushhour.engine;
+package rushhour.engine;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import hu.nye.rushhour.model.Board;
-import hu.nye.rushhour.model.ExitSide;
-import hu.nye.rushhour.model.GameState;
-import hu.nye.rushhour.model.Orientation;
-import hu.nye.rushhour.model.Position;
-import hu.nye.rushhour.model.Vehicle;
+
+import rushhour.engine.WinConditionChecker;
+import rushhour.model.Board;
+import rushhour.model.ExitSide;
+import rushhour.model.GameState;
+import rushhour.model.Orientation;
+import rushhour.model.Position;
+import rushhour.model.Vehicle;
 import org.junit.jupiter.api.Test;
 
 public class WinConditionCheckerTest {

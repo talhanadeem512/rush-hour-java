@@ -1,6 +1,9 @@
-package hu.nye.rushhour.engine;
+package rushhour.engine;
 
 import org.junit.jupiter.api.Test;
+import rushhour.engine.Player;
+import rushhour.engine.TurnManager;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TurnManagerTest {

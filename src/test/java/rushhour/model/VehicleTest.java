@@ -1,6 +1,9 @@
-package hu.nye.rushhour.model;
+package rushhour.model;
 
 import org.junit.jupiter.api.Test;
+import rushhour.model.Orientation;
+import rushhour.model.Position;
+import rushhour.model.Vehicle;
 
 import static org.junit.jupiter.api.Assertions.*;
 

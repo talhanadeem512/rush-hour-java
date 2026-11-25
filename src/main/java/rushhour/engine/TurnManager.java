@@ -1,37 +1,36 @@
-package hu.nye.rushhour.engine;
+package rushhour.engine;
 
 /**
  * Manages the turns of the human and machine players.
  */
 public class TurnManager {
 
-    private Player currentplayer;
+    private Player currentPlayer;
 
     /**
      * Creates a turn manager with the human player starting first.
      */
     public TurnManager() {
-        this.currentplayer = Player.HUMAN;
+        this.currentPlayer = Player.HUMAN;
     }
 
     /**
      * Returns the player whose turn it currently is.
      *
-     * @return the current player.
+     * @return the current player
      */
     public Player getCurrentPlayer() {
-        return currentplayer;
+        return currentPlayer;
     }
 
     /**
-     * Switches the turn to the other players.
+     * Switches the turn to the other player.
      */
     public void switchTurn() {
-        if(currentplayer == Player.HUMAN) {
-            currentplayer = Player.MACHINE;
-        }
-        else  {
-            currentplayer = Player.HUMAN;
+        if (currentPlayer == Player.HUMAN) {
+            currentPlayer = Player.MACHINE;
+        } else {
+            currentPlayer = Player.HUMAN;
         }
     }
 }

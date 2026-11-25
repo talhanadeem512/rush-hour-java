@@ -1,6 +1,8 @@
-package hu.nye.rushhour.model;
+package rushhour.model;
 
 import org.junit.jupiter.api.Test;
+import rushhour.model.Move;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class MoveTest {

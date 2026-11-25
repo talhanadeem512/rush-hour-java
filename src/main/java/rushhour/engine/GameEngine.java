@@ -1,7 +1,11 @@
-package hu.nye.rushhour.engine;
+package rushhour.engine;
 
-import hu.nye.rushhour.model.*;
+import rushhour.model.*;
 
+/**
+ * Manages the core game operations, including move validation, move execution,
+ * vehicle movement, turn management, and win-condition checking.
+ */
 public class GameEngine {
 
     private final GameState gameState;
@@ -9,8 +13,10 @@ public class GameEngine {
     private final WinConditionChecker winConditionChecker;
 
     /**
-     * Create a game engine for the given game state.
+     * Creates a game engine for the given game state.
      *
+     * @param gameState the initial state of the game
+     * @throws IllegalArgumentException if the game state is null
      */
     public GameEngine(GameState gameState) {
         if (gameState == null) {
@@ -23,9 +29,11 @@ public class GameEngine {
     }
 
     /**
-     * Finds a vehicle on the board using its ID.
+     * Finds a vehicle on the board using its unique ID.
      *
-     * @return the matching vehicle
+     * @param vehicleId the ID of the vehicle to find
+     * @return the vehicle matching the specified ID
+     * @throws IllegalArgumentException if the vehicle ID is null, blank, or does not exist
      */
     public Vehicle findVehicleById(String vehicleId) {
         if (vehicleId == null || vehicleId.isBlank()) {
@@ -46,7 +54,7 @@ public class GameEngine {
      *
      * @param vehicle the vehicle being moved
      * @param move the requested movement
-     * @return an array containing the new row and column
+     * @return an array containing the new row at index 0 and new column at index 1
      */
     private int[] calculateNewPosition(Vehicle vehicle, Move move) {
         int newRow = vehicle.getPosition().getRow();
@@ -65,7 +73,7 @@ public class GameEngine {
      * Checks whether a requested vehicle movement is valid.
      *
      * @param move the requested movement
-     * @return true if the movement is valid
+     * @return true if the movement is valid; false otherwise
      */
     public boolean isMoveValid(Move move) {
         if (move == null) {
@@ -114,9 +122,10 @@ public class GameEngine {
     }
 
     /**
-     * Checks whether a vehicle's destination overlaps another vehicle.
+     * Checks whether the destination of a moved vehicle overlaps another vehicle.
      *
-     * @return true if another vehicle occupies one of its cells.
+     * @param movedVehicle the vehicle whose destination is being checked
+     * @return true if the vehicle overlaps another vehicle; false otherwise
      */
     private boolean overlapsWithOtherVehicle(Vehicle movedVehicle) {
         Board board = gameState.getBoard();
@@ -142,10 +151,13 @@ public class GameEngine {
 
         return false;
     }
+
     /**
      * Gets the position of a specific cell occupied by a vehicle.
      *
-     * @return the cell position
+     * @param vehicle the vehicle whose cell position is required
+     * @param index the zero-based index of the cell within the vehicle
+     * @return the position of the specified cell
      */
     private Position getVehicleCell(Vehicle vehicle, int index) {
         Position position = vehicle.getPosition();
@@ -157,6 +169,13 @@ public class GameEngine {
         return new Position(position.getRow() + index, position.getColumn());
     }
 
+    /**
+     * Checks whether the complete path of a requested vehicle movement is clear.
+     *
+     * @param vehicle the vehicle being moved
+     * @param move the requested movement
+     * @return true if every cell along the movement path is unoccupied; false otherwise
+     */
     private boolean isPathClear(Vehicle vehicle, Move move) {
         int direction = Integer.signum(move.getDistance());
         int distance = Math.abs(move.getDistance());
@@ -210,9 +229,10 @@ public class GameEngine {
 
     /**
      * Executes a valid move and updates the board.
+     * If a hero vehicle exits the board, it is removed and its exit status is updated.
      *
      * @param move the move to execute
-     * @throws IllegalArgumentException if the move is invalid
+     * @throws IllegalArgumentException if the game has ended or the requested move is invalid
      */
     public void executeMove(Move move) {
         if (hasHumanWon() || hasMachineWon()) {
@@ -270,10 +290,12 @@ public class GameEngine {
     }
 
     /**
-     * Executes a move on behalf of the current player.
+     * Executes a move on behalf of the specified player and updates the turn.
      *
-     * @throws IllegalArgumentException if the player is null or it is not their turn
-     * @throws IllegalArgumentException if the move is invalid
+     * @param player the player attempting to make the move
+     * @param move the move to execute
+     * @throws IllegalArgumentException if the player is null, it is not their turn,
+     *                                  or the requested move is invalid
      */
     public void executeTurnMove(Player player, Move move) {
         if(player == null || player != turnManager.getCurrentPlayer()) {
@@ -288,18 +310,18 @@ public class GameEngine {
     }
 
     /**
-     * Checks whether the human player has won.
+     * Checks whether the human player has won the game.
      *
-     * @return true if the human hero has exited the board.
+     * @return true if the human hero has exited the board; false otherwise
      */
     public boolean hasHumanWon(){
         return winConditionChecker.hasHumanWon(gameState);
     }
 
     /**
-     * Checks whether the machine player has won.
+     * Checks whether the machine player has won the game.
      *
-     * @return true if the machine hero has exited the board.
+     * @return true if the machine hero has exited the board; false otherwise
      */
     public boolean hasMachineWon(){
         return winConditionChecker.hasMachineWon(gameState);
@@ -308,7 +330,9 @@ public class GameEngine {
     /**
      * Checks whether a hero vehicle is moving toward its assigned exit.
      *
-     * @return true if the vehicle is a hero moving toward its assigned unit.
+     * @param vehicle the vehicle being moved
+     * @param move the requested movement
+     * @return true if the vehicle is a hero moving toward its assigned exit; false otherwise
      */
     private boolean isMovingTowardAssignedExit(Vehicle vehicle, Move move) {
         String vehicleId = vehicle.getId();
@@ -332,9 +356,10 @@ public class GameEngine {
     }
 
     /**
-     * Checks whether a hero vehicle is aligned with its assigned exit.
+     * Checks whether a hero vehicle is aligned with its assigned exit coordinate.
      *
-     * @return true if the vehicle is aligned with its assigned exit
+     * @param vehicle the hero vehicle being checked
+     * @return true if the vehicle is aligned with its assigned exit; false otherwise
      */
     private boolean isHeroAtAssignedExitCoordinate(Vehicle vehicle) {
         if (vehicle.getId().equals(gameState.getHumanHeroID())) {
@@ -361,9 +386,12 @@ public class GameEngine {
     }
 
     /**
-     * Calculates the movement distance required for a hero to leave the board.
+     * Calculates the movement distance required for a hero vehicle to leave the board
+     * completely through the specified exit side.
      *
-     * @return the distance required to move the entire vehicle outside the board
+     * @param vehicle the hero vehicle leaving the board
+     * @param exitSide the side of the board containing the assigned exit
+     * @return the signed distance required to move the entire vehicle outside the board
      */
     private int calculateExitDistance(Vehicle vehicle, ExitSide exitSide) {
         Position position = vehicle.getPosition();
@@ -378,9 +406,11 @@ public class GameEngine {
     }
 
     /**
-     * Checks whether a move allows a hero to exit through its assigned exit.
+     * Checks whether a move allows a hero vehicle to exit through its assigned exit.
      *
-     * @return true if this is a valid hero exit move
+     * @param vehicle the vehicle being moved
+     * @param move the requested movement
+     * @return true if the move completely takes the hero through its assigned exit; false otherwise
      */
     private boolean isValidHeroExitMove(Vehicle vehicle, Move move) {
         if (!isMovingTowardAssignedExit(vehicle, move)) {
@@ -402,6 +432,11 @@ public class GameEngine {
         return move.getDistance() == calculateExitDistance(vehicle, exitSide);
     }
 
+    /**
+     * Gets the player whose turn it currently is.
+     *
+     * @return the player whose turn is active
+     */
     public Player getCurrentPlayer() {
         return turnManager.getCurrentPlayer();
     }

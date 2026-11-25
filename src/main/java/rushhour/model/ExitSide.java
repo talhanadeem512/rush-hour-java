@@ -1,5 +1,5 @@
 
-package hu.nye.rushhour.model;
+package rushhour.model;
 
 /**
  * Represents the side of the board through which a Hero Car exits.
