@@ -42,27 +42,31 @@ public class GameEngine {
     }
 
     /**
-     * Calculates the new position of vehicle after a requested move.
+     * Calculates the new row and column of a vehicle after a requested move.
      *
-     * @return the new position
+     * @param vehicle the vehicle being moved
+     * @param move the requested movement
+     * @return an array containing the new row and column
      */
-    private Position calculateNewPosition(Vehicle vehicle, Move move) {
-
-        Position currentPosition = vehicle.getPosition();
+    private int[] calculateNewPosition(Vehicle vehicle, Move move) {
+        int newRow = vehicle.getPosition().getRow();
+        int newColumn = vehicle.getPosition().getColumn();
 
         if (vehicle.getOrientation() == Orientation.HORIZONTAL) {
-            return new Position(
-                    currentPosition.getRow(),
-                    currentPosition.getColumn() + move.getDistance()
-            );
+            newColumn += move.getDistance();
+        } else {
+            newRow += move.getDistance();
         }
 
-        return new Position(
-                currentPosition.getRow() + move.getDistance(),
-                currentPosition.getColumn()
-        );
+        return new int[]{newRow, newColumn};
     }
 
+    /**
+     * Checks whether a requested vehicle movement is valid.
+     *
+     * @param move the requested movement
+     * @return true if the movement is valid
+     */
     public boolean isMoveValid(Move move) {
         if (move == null) {
             return false;
@@ -70,26 +74,36 @@ public class GameEngine {
 
         Vehicle vehicle;
 
-        try{
+        try {
             vehicle = findVehicleById(move.getVehicleId());
-        }catch(IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             return false;
         }
 
-        Position newPosition = calculateNewPosition(vehicle, move);
+        int[] newPosition = calculateNewPosition(vehicle, move);
+
+        int newRow = newPosition[0];
+        int newColumn = newPosition[1];
 
         Board board = gameState.getBoard();
 
-        // Check whether the vehicle remains inside the board.
-        Vehicle movedVehicle = new Vehicle(
-                vehicle.getId(),
-                vehicle.getLength(),
-                vehicle.getOrientation(),
-                newPosition
-        );
+        boolean withinBounds;
 
-        if (!board.isWithinBounds(movedVehicle)) {
-            return false;
+        if (vehicle.getOrientation() == Orientation.HORIZONTAL) {
+            withinBounds = newRow >= 0
+                    && newRow < board.getRows()
+                    && newColumn >= 0
+                    && newColumn + vehicle.getLength() <= board.getColumns();
+        } else {
+            withinBounds = newColumn >= 0
+                    && newColumn < board.getColumns()
+                    && newRow >= 0
+                    && newRow + vehicle.getLength() <= board.getRows();
+        }
+
+        if (!withinBounds) {
+            return isValidHeroExitMove(vehicle, move)
+                    && isPathClear(vehicle, move);
         }
 
         if (!isPathClear(vehicle, move)) {
@@ -143,35 +157,51 @@ public class GameEngine {
         return new Position(position.getRow() + index, position.getColumn());
     }
 
-    /**
-     * Checks whether the complete movement path is free of other vehicles.
-     *
-     * @param vehicle the vehicle being moved
-     * @param move the requested movement
-     * @return true if the complete path is clear
-     */
     private boolean isPathClear(Vehicle vehicle, Move move) {
         int direction = Integer.signum(move.getDistance());
         int distance = Math.abs(move.getDistance());
 
+        Board board = gameState.getBoard();
+
         for (int step = 1; step <= distance; step++) {
-            Move intermediateMove = new Move(
-                    move.getVehicleId(),
-                    direction * step
+            int[] position = calculateNewPosition(
+                    vehicle,
+                    new Move(move.getVehicleId(), direction * step)
             );
 
-            Position intermediatePosition =
-                    calculateNewPosition(vehicle, intermediateMove);
+            int movedRow = position[0];
+            int movedColumn = position[1];
 
-            Vehicle intermediateVehicle = new Vehicle(
-                    vehicle.getId(),
-                    vehicle.getLength(),
-                    vehicle.getOrientation(),
-                    intermediatePosition
-            );
+            for (Vehicle other : board.getVehicles()) {
+                if (other.getId().equals(vehicle.getId())) {
+                    continue;
+                }
 
-            if (overlapsWithOtherVehicle(intermediateVehicle)) {
-                return false;
+                for (int i = 0; i < vehicle.getLength(); i++) {
+                    int cellRow = movedRow;
+                    int cellColumn = movedColumn;
+
+                    if (vehicle.getOrientation() == Orientation.HORIZONTAL) {
+                        cellColumn += i;
+                    } else {
+                        cellRow += i;
+                    }
+
+                    for (int j = 0; j < other.getLength(); j++) {
+                        int otherRow = other.getPosition().getRow();
+                        int otherColumn = other.getPosition().getColumn();
+
+                        if (other.getOrientation() == Orientation.HORIZONTAL) {
+                            otherColumn += j;
+                        } else {
+                            otherRow += j;
+                        }
+
+                        if (cellRow == otherRow && cellColumn == otherColumn) {
+                            return false;
+                        }
+                    }
+                }
             }
         }
 
@@ -179,9 +209,10 @@ public class GameEngine {
     }
 
     /**
-     * Executes a valid move nad updates the board.
+     * Executes a valid move and updates the board.
      *
-     * @throws IllegalArgumentException if the move is invalid.
+     * @param move the move to execute
+     * @throws IllegalArgumentException if the move is invalid
      */
     public void executeMove(Move move) {
         if (!isMoveValid(move)) {
@@ -190,11 +221,49 @@ public class GameEngine {
 
         Vehicle vehicle = findVehicleById(move.getVehicleId());
 
-        Position newPosition = calculateNewPosition(vehicle, move);
+        int[] newPosition = calculateNewPosition(vehicle, move);
 
-        Vehicle updatedvehicle = new Vehicle(vehicle.getId(), vehicle.getLength(), vehicle.getOrientation(), newPosition);
+        int newRow = newPosition[0];
+        int newColumn = newPosition[1];
 
-        gameState.getBoard().updateVehicle(updatedvehicle);
+        Board board = gameState.getBoard();
+
+        boolean withinBounds;
+
+        if (vehicle.getOrientation() == Orientation.HORIZONTAL) {
+            withinBounds = newRow >= 0
+                    && newRow < board.getRows()
+                    && newColumn >= 0
+                    && newColumn + vehicle.getLength() <= board.getColumns();
+        } else {
+            withinBounds = newColumn >= 0
+                    && newColumn < board.getColumns()
+                    && newRow >= 0
+                    && newRow + vehicle.getLength() <= board.getRows();
+        }
+
+        if (!withinBounds) {
+            board.removeVehicleById(vehicle.getId());
+
+            if (vehicle.getId().equals(gameState.getHumanHeroID())) {
+                gameState.setHumanHeroExited(true);
+            } else {
+                gameState.setMachineHeroExited(true);
+            }
+
+            return;
+        }
+
+        Position position = new Position(newRow, newColumn);
+
+        Vehicle updatedVehicle = new Vehicle(
+                vehicle.getId(),
+                vehicle.getLength(),
+                vehicle.getOrientation(),
+                position
+        );
+
+        board.updateVehicle(updatedVehicle);
     }
 
     /**
@@ -229,6 +298,103 @@ public class GameEngine {
      */
     public boolean hasMachineWon(){
         return winConditionChecker.hasMachineWon(gameState);
+    }
+
+    /**
+     * Checks whether a hero vehicle is moving toward its assigned exit.
+     *
+     * @return true if the vehicle is a hero moving toward its assigned unit.
+     */
+    private boolean isMovingTowardAssignedExit(Vehicle vehicle, Move move) {
+        String vehicleId = vehicle.getId();
+        int distance = move.getDistance();
+
+        if(vehicleId.equals(gameState.getHumanHeroID())){
+            return switch (gameState.getHumanExitSide()){
+                case LEFT, TOP -> distance < 0;
+                case RIGHT, BOTTOM -> distance > 0;
+            };
+        }
+
+        if(vehicleId.equals(gameState.getMachineHeroID())){
+            return switch(gameState.getMachineExitSide()){
+                case LEFT, TOP -> distance < 0;
+                case RIGHT, BOTTOM -> distance > 0;
+            };
+        }
+
+        return false;
+    }
+
+    /**
+     * Checks whether a hero vehicle is aligned with its assigned exit.
+     *
+     * @return true if the vehicle is aligned with its assigned exit
+     */
+    private boolean isHeroAtAssignedExitCoordinate(Vehicle vehicle) {
+        if (vehicle.getId().equals(gameState.getHumanHeroID())) {
+            if (vehicle.getOrientation() == Orientation.HORIZONTAL) {
+                return vehicle.getPosition().getRow()
+                        == gameState.getHumanExitCoordinate();
+            }
+
+            return vehicle.getPosition().getColumn()
+                    == gameState.getHumanExitCoordinate();
+        }
+
+        if (vehicle.getId().equals(gameState.getMachineHeroID())) {
+            if (vehicle.getOrientation() == Orientation.HORIZONTAL) {
+                return vehicle.getPosition().getRow()
+                        == gameState.getMachineExitCoordinate();
+            }
+
+            return vehicle.getPosition().getColumn()
+                    == gameState.getMachineExitCoordinate();
+        }
+
+        return false;
+    }
+
+    /**
+     * Calculates the movement distance required for a hero to leave the board.
+     *
+     * @return the distance required to move the entire vehicle outside the board
+     */
+    private int calculateExitDistance(Vehicle vehicle, ExitSide exitSide) {
+        Position position = vehicle.getPosition();
+        Board board = gameState.getBoard();
+
+        return switch (exitSide) {
+            case RIGHT -> board.getColumns() - position.getColumn();
+            case LEFT -> -(position.getColumn() + vehicle.getLength());
+            case BOTTOM -> board.getRows() - position.getRow();
+            case TOP -> -(position.getRow() + vehicle.getLength());
+        };
+    }
+
+    /**
+     * Checks whether a move allows a hero to exit through its assigned exit.
+     *
+     * @return true if this is a valid hero exit move
+     */
+    private boolean isValidHeroExitMove(Vehicle vehicle, Move move) {
+        if (!isMovingTowardAssignedExit(vehicle, move)) {
+            return false;
+        }
+
+        if (!isHeroAtAssignedExitCoordinate(vehicle)) {
+            return false;
+        }
+
+        ExitSide exitSide;
+
+        if (vehicle.getId().equals(gameState.getHumanHeroID())) {
+            exitSide = gameState.getHumanExitSide();
+        } else {
+            exitSide = gameState.getMachineExitSide();
+        }
+
+        return move.getDistance() == calculateExitDistance(vehicle, exitSide);
     }
 
     public Player getCurrentPlayer() {

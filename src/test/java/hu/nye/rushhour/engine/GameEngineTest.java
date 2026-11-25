@@ -360,4 +360,58 @@ public class GameEngineTest {
         assertFalse(gameEngine.hasHumanWon());
         assertTrue(gameEngine.hasMachineWon());
     }
+
+    @Test
+    void shouldRemoveHumanHeroAndDeclareHumanWinnerWhenHeroExits() {
+        Board board = new Board(6, 12);
+
+        board.addVehicle(new Vehicle(
+                "H", 2, Orientation.HORIZONTAL, new Position(2, 8)
+        ));
+
+        board.addVehicle(new Vehicle(
+                "M", 2, Orientation.HORIZONTAL, new Position(3, 0)
+        ));
+
+        GameState gameState = new GameState(
+                board, "H", "M", 2, 3, ExitSide.RIGHT, ExitSide.LEFT
+        );
+
+        GameEngine gameEngine = new GameEngine(gameState);
+
+        gameEngine.executeMove(new Move("H", 4));
+
+        assertTrue(gameState.hasHumanHeroExited());
+        assertTrue(gameEngine.hasHumanWon());
+        assertFalse(gameEngine.hasMachineWon());
+        assertFalse(board.containsVehicleId("H"));
+        assertEquals(1, board.getVehicleCount());
+    }
+
+    @Test
+    void shouldRemoveMachineHeroAndDeclareMachineWinnerWhenHeroExits() {
+        Board board = new Board(6, 12);
+
+        board.addVehicle(new Vehicle(
+                "H", 2, Orientation.HORIZONTAL, new Position(2, 8)
+        ));
+
+        board.addVehicle(new Vehicle(
+                "M", 2, Orientation.HORIZONTAL, new Position(3, 0)
+        ));
+
+        GameState gameState = new GameState(
+                board, "H", "M", 2, 3, ExitSide.RIGHT, ExitSide.LEFT
+        );
+
+        GameEngine gameEngine = new GameEngine(gameState);
+
+        gameEngine.executeMove(new Move("M", -2));
+
+        assertTrue(gameState.hasMachineHeroExited());
+        assertTrue(gameEngine.hasMachineWon());
+        assertFalse(gameEngine.hasHumanWon());
+        assertFalse(board.containsVehicleId("M"));
+        assertEquals(1, board.getVehicleCount());
+    }
 }
