@@ -215,6 +215,9 @@ public class GameEngine {
      * @throws IllegalArgumentException if the move is invalid
      */
     public void executeMove(Move move) {
+        if (hasHumanWon() || hasMachineWon()) {
+            throw new IllegalArgumentException("Cannot make moves after the game has ended");
+        }
         if (!isMoveValid(move)) {
             throw new IllegalArgumentException("Invalid move.");
         }
@@ -279,7 +282,9 @@ public class GameEngine {
 
         executeMove(move);
 
-        turnManager.switchTurn();
+        if(!hasHumanWon() || !hasMachineWon()) {
+            turnManager.switchTurn();
+        }
     }
 
     /**

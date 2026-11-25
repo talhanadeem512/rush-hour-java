@@ -414,4 +414,17 @@ public class GameEngineTest {
         assertFalse(board.containsVehicleId("M"));
         assertEquals(1, board.getVehicleCount());
     }
+
+    @Test
+    void shouldRejectMovesAfterHumanHasWon() {
+        Board board = new Board(6, 12);
+
+        board.addVehicle(new Vehicle("H", 2, Orientation.HORIZONTAL, new Position(2, 0)));
+        board.addVehicle(new Vehicle("M", 2, Orientation.HORIZONTAL, new Position(3, 0)));
+
+        GameState gameState = new GameState(board, "H", "M", 2, 3, ExitSide.RIGHT, ExitSide.LEFT);
+        gameState.setHumanHeroExited(true);
+        GameEngine gameEngine = new GameEngine(gameState);
+        assertThrows(IllegalArgumentException.class, () -> gameEngine.executeMove(new Move("M", 1)));
+    }
 }
