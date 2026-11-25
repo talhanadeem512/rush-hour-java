@@ -6,6 +6,7 @@ public class GameEngine {
 
     private final GameState gameState;
     private final TurnManager turnManager;
+    private final WinConditionChecker winConditionChecker;
 
     /**
      * Create a game engine for the given game state.
@@ -18,6 +19,7 @@ public class GameEngine {
 
         this.gameState = gameState;
         this.turnManager = new TurnManager();
+        this.winConditionChecker = new WinConditionChecker();
     }
 
     /**
@@ -209,6 +211,24 @@ public class GameEngine {
         executeMove(move);
 
         turnManager.switchTurn();
+    }
+
+    /**
+     * Checks whether the human player has won.
+     *
+     * @return true if the human hero has exited the board.
+     */
+    public boolean hasHumanWon(){
+        return winConditionChecker.hasHumanWon(gameState);
+    }
+
+    /**
+     * Checks whether the machine player has won.
+     *
+     * @return true if the machine hero has exited the board.
+     */
+    public boolean hasMachineWon(){
+        return winConditionChecker.hasMachineWon(gameState);
     }
 
     public Player getCurrentPlayer() {
