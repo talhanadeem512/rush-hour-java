@@ -463,8 +463,7 @@ public class GameEngineTest {
 
         engine.executeMachineTurn();
 
-        assertFalse(engine.hasHumanWon());
-        assertFalse(engine.hasMachineWon());
+        assertEquals(Player.HUMAN, engine.getCurrentPlayer());
     }
 
     @Test
