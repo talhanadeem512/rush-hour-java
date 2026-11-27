@@ -4,6 +4,8 @@ import org.junit.jupiter.api.Test;
 import rushhour.engine.GameEngine;
 import rushhour.engine.Player;
 import rushhour.model.*;
+import rushhour.ai.MoveGenerator;
+import rushhour.ai.MoveSelector;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -297,6 +299,19 @@ public class GameEngineTest {
     }
 
     @Test
+    void shouldRejectMachineTurnWhenItsHumanTurn(){
+        Board board = new Board(6, 12);
+
+        board.addVehicle(new Vehicle("H", 2, Orientation.HORIZONTAL, new Position(2, 1)));
+        board.addVehicle(new Vehicle("M", 2, Orientation.VERTICAL, new Position(4, 8)));
+
+        GameState state = new GameState(board, "H", "M", 2, 8, ExitSide.RIGHT, ExitSide.BOTTOM);
+        GameEngine engine = new GameEngine(state);
+
+        assertThrows(IllegalArgumentException.class, engine::executeMachineTurn);
+        assertEquals(Player.HUMAN, engine.getCurrentPlayer());
+    }
+    @Test
     void shouldRejectMachineMoveOnHumanTurn(){
         Board board = new Board(6, 12);
 
@@ -429,5 +444,51 @@ public class GameEngineTest {
         gameState.setHumanHeroExited(true);
         GameEngine gameEngine = new GameEngine(gameState);
         assertThrows(IllegalArgumentException.class, () -> gameEngine.executeMove(new Move("M", 1)));
+    }
+
+    @Test
+    void shouldExecuteMachineTurnAndSwitchBackToHuman() {
+        Board board = new Board(6, 12);
+
+        board.addVehicle(new Vehicle("H", 2, Orientation.HORIZONTAL, new Position(2, 1)));
+        board.addVehicle(new Vehicle("M", 2, Orientation.HORIZONTAL, new Position(4, 1)));
+
+        GameState state = new GameState(board, "H", "M", 2, 4, ExitSide.RIGHT, ExitSide.RIGHT);
+
+        GameEngine engine = new GameEngine(state);
+
+        engine.executeTurnMove(Player.HUMAN, new Move("H", 1));
+
+        assertEquals(Player.MACHINE, engine.getCurrentPlayer());
+
+        engine.executeMachineTurn();
+
+        assertFalse(engine.hasHumanWon());
+        assertFalse(engine.hasMachineWon());
+    }
+
+    @Test
+    void shouldNotSwitchTurnAfterMachineWins() {
+        Board board = new Board(6, 12);
+
+        board.addVehicle(new Vehicle(
+                "H", 2, Orientation.HORIZONTAL, new Position(2, 1)
+        ));
+        board.addVehicle(new Vehicle(
+                "M", 2, Orientation.HORIZONTAL, new Position(3, 10)
+        ));
+
+        GameState state = new GameState(
+                board, "H", "M", 2, 3, ExitSide.RIGHT, ExitSide.RIGHT
+        );
+
+        GameEngine engine = new GameEngine(state);
+
+        engine.executeTurnMove(Player.HUMAN, new Move("H", 1));
+        engine.executeTurnMove(Player.MACHINE, new Move("M", 2));
+
+        assertTrue(engine.hasMachineWon());
+        assertFalse(engine.hasHumanWon());
+        assertEquals(Player.MACHINE, engine.getCurrentPlayer());
     }
 }

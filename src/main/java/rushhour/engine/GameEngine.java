@@ -1,6 +1,9 @@
 package rushhour.engine;
 
 import rushhour.model.*;
+import rushhour.ai.MoveSelector;
+import rushhour.ai.MoveGenerator;
+import java.util.List;
 
 /**
  * Manages the core game operations, including move validation, move execution,
@@ -11,6 +14,8 @@ public class GameEngine {
     private final GameState gameState;
     private final TurnManager turnManager;
     private final WinConditionChecker winConditionChecker;
+    private final MoveSelector moveSelector;
+    private final MoveGenerator moveGenerator;
 
     /**
      * Creates a game engine for the given game state.
@@ -26,6 +31,8 @@ public class GameEngine {
         this.gameState = gameState;
         this.turnManager = new TurnManager();
         this.winConditionChecker = new WinConditionChecker();
+        this.moveSelector = new MoveSelector();
+        this.moveGenerator = new MoveGenerator();
     }
 
     /**
@@ -304,11 +311,27 @@ public class GameEngine {
 
         executeMove(move);
 
-        if(!hasHumanWon() || !hasMachineWon()) {
+        if(!hasHumanWon() && !hasMachineWon()) {
             turnManager.switchTurn();
         }
     }
 
+    /**
+     * Generates and executes a random valid move for the machine player.
+     *
+     * @throws IllegalArgumentException if it is not the machine's turn or no valid moves exist.
+     */
+    public void executeMachineTurn(){
+        if(turnManager.getCurrentPlayer() != Player.MACHINE){
+            throw new IllegalArgumentException("It is not the machine's turn.");
+        }
+
+        List<Move> validMoves = moveGenerator.generateValidMoves(gameState, this);
+
+        Move selectedMove = moveSelector.selectRandomMove(validMoves);
+
+        executeTurnMove(Player.MACHINE, selectedMove);
+    }
     /**
      * Checks whether the human player has won the game.
      *
