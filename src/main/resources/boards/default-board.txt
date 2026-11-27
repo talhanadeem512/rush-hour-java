@@ -1,0 +1,13 @@
+rows=6
+columns=6
+
+humanHeroId=H
+machineHeroId=M
+
+humanExit=RIGHT,2
+machineExit=RIGHT,4
+
+vehicle=H,HORIZONTAL,2,2,1
+vehicle=M,HORIZONTAL,2,4,1
+vehicle=A,VERTICAL,3,0,0
+vehicle=B,HORIZONTAL,2,0,3
