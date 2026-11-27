@@ -4,6 +4,7 @@ import rushhour.model.*;
 import rushhour.ai.MoveSelector;
 import rushhour.ai.MoveGenerator;
 import java.util.List;
+import rushhour.logging.GameLogger;
 
 /**
  * Manages the core game operations, including move validation, move execution,
@@ -16,7 +17,7 @@ public class GameEngine {
     private final WinConditionChecker winConditionChecker;
     private final MoveSelector moveSelector;
     private final MoveGenerator moveGenerator;
-
+    private final GameLogger gameLogger;
     /**
      * Creates a game engine for the given game state.
      *
@@ -33,6 +34,8 @@ public class GameEngine {
         this.winConditionChecker = new WinConditionChecker();
         this.moveSelector = new MoveSelector();
         this.moveGenerator = new MoveGenerator();
+        this.gameLogger = new GameLogger();
+        this.gameLogger.logGameStarted();
     }
 
     /**
@@ -311,7 +314,14 @@ public class GameEngine {
 
         executeMove(move);
 
-        if(!hasHumanWon() && !hasMachineWon()) {
+        gameLogger.logMove(player, move);
+        if(hasHumanWon()){
+            gameLogger.logGameWon(Player.HUMAN);
+        }
+        else if(hasMachineWon()){
+            gameLogger.logGameWon(Player.MACHINE);
+        }
+        else  {
             turnManager.switchTurn();
         }
     }
